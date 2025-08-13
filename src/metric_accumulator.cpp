@@ -20,12 +20,13 @@
 
 namespace analyser::metric_accumulator {
 
-void MetricsAccumulator::AccumulateNextFunctionResults(const std::vector<metric::MetricResult> &metric_results) const {
-    // здесь ваш код
+void MetricsAccumulator::AccumulateNextFunctionResults(
+    const std::vector<metric::MetricResult> &metric_results) const {
+  // здесь ваш код
 }
 
 void MetricsAccumulator::ResetAccumulators() {
-    // здесь ваш код
+  // здесь ваш код
 }
 
-}  // namespace analyser::metric_accumulator
+} // namespace analyser::metric_accumulator

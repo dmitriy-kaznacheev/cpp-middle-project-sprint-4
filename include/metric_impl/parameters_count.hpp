@@ -16,8 +16,8 @@
 
 namespace analyser::metric::metric_impl {
 
-struct CountParametersMetric final: public IMetric {
-    // здесь ваш код
+struct CountParametersMetric final : public IMetric {
+  // здесь ваш код
 };
 
 } // namespace analyser::metric::metric_impl
