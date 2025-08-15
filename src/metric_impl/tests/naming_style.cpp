@@ -7,7 +7,8 @@ namespace analyser::metric::metric_impl {
 
 using namespace std::string_literals;
 
-class naming_style : public testing::Test {
+class naming_style
+    : public ::testing::TestWithParam<std::tuple<std::string, std::string>> {
 protected:
   NamingStyleMetric metric{};
 
@@ -20,49 +21,34 @@ protected:
 
 TEST_F(naming_style, name) { EXPECT_EQ(metric.Name(), "naming_style"s); }
 
-TEST_F(naming_style, lower_case) {
-  auto f = get_function("functionname"s);
+TEST_P(naming_style, function) {
+  auto expected = std::get<1>(GetParam());
+  auto func_name = std::get<0>(GetParam());
+  auto f = get_function(func_name);
+  ASSERT_EQ(expected, std::get<std::string>(metric.CalculateImpl(f)));
+}
 
-  const auto expected = "lower case"s;
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(
+    , naming_style,
+    ::testing::Values(
+        std::make_tuple("functionname"s, "lower case"s),
+        std::make_tuple("function_name"s, "snake case"s),
+        std::make_tuple("functionName"s, "camel case"s),
+        std::make_tuple("FunctionName"s, "pascal case"s),
+        std::make_tuple("FUNCTION_NAME"s, "unknown"s)));
+// clang-format off
+
+#if 0
+std::make_tuple("functionname"s, "lower case"s),
+std::make_tuple("function_name"s, "snake case"s),
+std::make_tuple("functionName"s, "camel case"s),
+std::make_tuple("FunctionName"s, "pascal case"s),
+std::make_tuple("FUNCTION_NAME"s, "unknown"s)
   const auto actual = std::get<std::string>(metric.CalculateImpl(f));
 
   EXPECT_EQ(expected, actual);
 }
-
-TEST_F(naming_style, snake_case) {
-  auto f = get_function("function_name"s);
-
-  const auto expected = "snake case"s;
-  const auto actual = std::get<std::string>(metric.CalculateImpl(f));
-
-  EXPECT_EQ(expected, actual);
-}
-
-TEST_F(naming_style, camel_case) {
-  auto f = get_function("functionName"s);
-
-  const auto expected = "camel case"s;
-  const auto actual = std::get<std::string>(metric.CalculateImpl(f));
-
-  EXPECT_EQ(expected, actual);
-}
-
-TEST_F(naming_style, pascal_case) {
-  auto f = get_function("FunctionName"s);
-
-  const auto expected = "pascal case"s;
-  const auto actual = std::get<std::string>(metric.CalculateImpl(f));
-
-  EXPECT_EQ(expected, actual);
-}
-
-TEST_F(naming_style, unknown) {
-  auto f = get_function("FUNCTION_NAME"s);
-
-  const auto expected = "unknown"s;
-  const auto actual = std::get<std::string>(metric.CalculateImpl(f));
-
-  EXPECT_EQ(expected, actual);
-}
+#endif
 
 } // namespace analyser::metric::metric_impl
