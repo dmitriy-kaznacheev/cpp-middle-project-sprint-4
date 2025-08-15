@@ -7,25 +7,24 @@ namespace analyser::metric::metric_impl {
 
 using namespace std::string_literals;
 
-class naming_style
-    : public ::testing::TestWithParam<std::tuple<std::string, std::string>> {
+class naming_style : public ::testing::TestWithParam<std::tuple<std::string, std::string>> {
 protected:
-  NamingStyleMetric metric{};
+    NamingStyleMetric metric{};
 
-  function::Function get_function(const std::string &function_name) {
-    function::Function f{};
-    f.name = function_name;
-    return f;
-  }
+    function::Function get_function(const std::string &function_name) {
+        function::Function f{};
+        f.name = function_name;
+        return f;
+    }
 };
 
 TEST_F(naming_style, name) { EXPECT_EQ(metric.Name(), "naming_style"s); }
 
 TEST_P(naming_style, function) {
-  auto expected = std::get<1>(GetParam());
-  auto func_name = std::get<0>(GetParam());
-  auto f = get_function(func_name);
-  ASSERT_EQ(expected, std::get<std::string>(metric.CalculateImpl(f)));
+    auto expected = std::get<1>(GetParam());
+    auto func_name = std::get<0>(GetParam());
+    auto f = get_function(func_name);
+    ASSERT_EQ(expected, std::get<std::string>(metric.CalculateImpl(f)));
 }
 
 // clang-format off

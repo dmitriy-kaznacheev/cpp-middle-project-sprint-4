@@ -8,24 +8,22 @@ using namespace std::string_literals;
 
 class parameters_count : public ::testing::TestWithParam<std::tuple<std::string, int>> {
 protected:
-  CountParametersMetric metric{};
+    CountParametersMetric metric{};
 
-  function::Function get_first_function(const std::string &filename) {
-    file::File f{filename};
-    function::FunctionExtractor extractor{};
-    return extractor.Get(f).at(0);
-  }
+    function::Function get_first_function(const std::string &filename) {
+        file::File f{filename};
+        function::FunctionExtractor extractor{};
+        return extractor.Get(f).at(0);
+    }
 };
 
-TEST_F(parameters_count, name) {
-  EXPECT_EQ(metric.Name(), "parameters_count"s);
-}
+TEST_F(parameters_count, name) { EXPECT_EQ(metric.Name(), "parameters_count"s); }
 
 TEST_P(parameters_count, file) {
-  auto expected = std::get<1>(GetParam());
-  auto filename = std::get<0>(GetParam());
-  auto f = get_first_function(filename);
-  ASSERT_EQ(expected, std::get<int>(metric.CalculateImpl(f)));
+    auto expected = std::get<1>(GetParam());
+    auto filename = std::get<0>(GetParam());
+    auto f = get_first_function(filename);
+    ASSERT_EQ(expected, std::get<int>(metric.CalculateImpl(f)));
 }
 
 // clang-format off

@@ -7,25 +7,24 @@ namespace analyser::metric::metric_impl {
 
 using namespace std::string_literals;
 
-class lines_count
-    : public ::testing::TestWithParam<std::tuple<std::string, int>> {
+class lines_count : public ::testing::TestWithParam<std::tuple<std::string, int>> {
 protected:
-  CodeLinesCountMetric metric{};
+    CodeLinesCountMetric metric{};
 
-  function::Function get_first_function(const std::string &filename) {
-    file::File f{filename};
-    function::FunctionExtractor extractor{};
-    return extractor.Get(f).at(0);
-  }
+    function::Function get_first_function(const std::string &filename) {
+        file::File f{filename};
+        function::FunctionExtractor extractor{};
+        return extractor.Get(f).at(0);
+    }
 };
 
 TEST_F(lines_count, name) { EXPECT_EQ(metric.Name(), "lines_count"s); }
 
 TEST_P(lines_count, file) {
-  auto expected = std::get<1>(GetParam());
-  auto filename = std::get<0>(GetParam());
-  auto f = get_first_function(filename);
-  ASSERT_EQ(expected, std::get<int>(metric.CalculateImpl(f)));
+    auto expected = std::get<1>(GetParam());
+    auto filename = std::get<0>(GetParam());
+    auto f = get_first_function(filename);
+    ASSERT_EQ(expected, std::get<int>(metric.CalculateImpl(f)));
 }
 
 // clang-format off

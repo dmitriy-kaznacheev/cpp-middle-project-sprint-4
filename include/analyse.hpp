@@ -27,10 +27,9 @@ namespace analyser {
 namespace rv = std::ranges::views;
 namespace rs = std::ranges;
 
-auto AnalyseFunctions(
-    const std::vector<std::string> &files,
-    const analyser::metric::MetricExtractor &metric_extractor) {
-  // clang-format off
+auto AnalyseFunctions(const std::vector<std::string> &files,
+                      const analyser::metric::MetricExtractor &metric_extractor) {
+    // clang-format off
   return files | 
          std::views::transform([](auto &&fn) {
            auto f = file::File{fn};
@@ -42,11 +41,11 @@ auto AnalyseFunctions(
            return std::make_pair(func, metrics);
          }) |
          rs::to<std::vector<std::pair<function::Function, metric::MetricResults>>>();
-  // clang-format on
+    // clang-format on
 }
 
 auto SplitByClasses(const auto &analysis) {
-  // clang-format off
+    // clang-format off
   return analysis | 
          std::views::filter([](const auto &p) {
            const auto &func = p.first;
@@ -58,29 +57,28 @@ auto SplitByClasses(const auto &analysis) {
            return lfunc.class_name.value() == rfunc.class_name.value();
          }) |
          rs::to<std::vector<std::vector<std::pair<function::Function, metric::MetricResults>>>>();
-  // clang-format on
+    // clang-format on
 }
 
 auto SplitByFiles(const auto &analysis) {
-  // clang-format off
+    // clang-format off
   return analysis | 
          std::views::chunk_by([](const auto &lhs, const auto &rhs) {
            return lhs.first.filename == rhs.first.filename;
          }) |
          rs::to<std::vector<std::vector<std::pair<function::Function, metric::MetricResults>>>>();
-  // clang-format on
+    // clang-format on
 }
 
-void AccumulateFunctionAnalysis(
-    const auto &analysis,
-    const analyser::metric_accumulator::MetricsAccumulator &accumulator) {
-  // clang-format off
+void AccumulateFunctionAnalysis(const auto &analysis,
+                                const analyser::metric_accumulator::MetricsAccumulator &accumulator) {
+    // clang-format off
   rs::for_each(analysis,
                [&accumulator](const auto &metric) {
                  accumulator.AccumulateNextFunctionResults(metric);
                },
                &std::pair<function::Function, metric::MetricResults>::second);
-  // clang-format on
+    // clang-format on
 }
 
-} // namespace analyser
+}  // namespace analyser

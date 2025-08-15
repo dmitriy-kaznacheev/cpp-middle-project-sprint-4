@@ -7,27 +7,24 @@ namespace analyser::metric::metric_impl {
 
 using namespace std::string_literals;
 
-class cyclomatic_complexity
-    : public ::testing::TestWithParam<std::tuple<std::string, int>> {
+class cyclomatic_complexity : public ::testing::TestWithParam<std::tuple<std::string, int>> {
 protected:
-  CyclomaticComplexityMetric metric{};
+    CyclomaticComplexityMetric metric{};
 
-  function::Function get_first_function(const std::string &filename) {
-    file::File f{filename};
-    function::FunctionExtractor extractor{};
-    return extractor.Get(f).at(0);
-  }
+    function::Function get_first_function(const std::string &filename) {
+        file::File f{filename};
+        function::FunctionExtractor extractor{};
+        return extractor.Get(f).at(0);
+    }
 };
 
-TEST_F(cyclomatic_complexity, name) {
-  EXPECT_EQ(metric.Name(), "cyclomatic_complexity"s);
-}
+TEST_F(cyclomatic_complexity, name) { EXPECT_EQ(metric.Name(), "cyclomatic_complexity"s); }
 
 TEST_P(cyclomatic_complexity, file) {
-  auto expected = std::get<1>(GetParam());
-  auto filename = std::get<0>(GetParam());
-  auto f = get_first_function(filename);
-  ASSERT_EQ(expected, std::get<int>(metric.CalculateImpl(f)));
+    auto expected = std::get<1>(GetParam());
+    auto filename = std::get<0>(GetParam());
+    auto f = get_first_function(filename);
+    ASSERT_EQ(expected, std::get<int>(metric.CalculateImpl(f)));
 }
 
 // clang-format off

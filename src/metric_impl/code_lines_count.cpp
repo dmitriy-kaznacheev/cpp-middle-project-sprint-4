@@ -22,31 +22,26 @@ namespace analyser::metric::metric_impl {
 
 using namespace std::string_literals;
 
-MetricResult::ValueType
-CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
-  auto res =
-      f.ast | std::views::split('\n') |
-      std::views::transform([](auto &&r) { return std::string_view{r}; }) |
-      std::views::filter([](auto &&str) { return !str.contains("comment"); }) |
-      std::views::transform([](auto &&r) {
-        int tmp_val = {0};
+MetricResult::ValueType CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
+    auto res = f.ast | std::views::split('\n') | std::views::transform([](auto &&r) { return std::string_view{r}; }) |
+               std::views::filter([](auto &&str) { return !str.contains("comment"); }) |
+               std::views::transform([](auto &&r) {
+                   int tmp_val = {0};
 
-        auto start_pos = r.find_first_of('[');
-        auto end_pos = r.find_first_of(',');
-        auto [e, errc] = std::from_chars(r.begin() + start_pos + 1,
-                                         r.begin() + end_pos, tmp_val);
-        if (errc != std::errc()) {
-          throw std::runtime_error(
-              "CodeLinesCountMetric::CalculateImpl parsing line index error!");
-        }
+                   auto start_pos = r.find_first_of('[');
+                   auto end_pos = r.find_first_of(',');
+                   auto [e, errc] = std::from_chars(r.begin() + start_pos + 1, r.begin() + end_pos, tmp_val);
+                   if (errc != std::errc()) {
+                       throw std::runtime_error("CodeLinesCountMetric::CalculateImpl parsing line index error!");
+                   }
 
-        return tmp_val;
-      }) |
-      std::ranges::to<std::unordered_set>(); // unique
+                   return tmp_val;
+               }) |
+               std::ranges::to<std::unordered_set>();  // unique
 
-  return static_cast<int>(res.size());
+    return static_cast<int>(res.size());
 }
 
 std::string CodeLinesCountMetric::Name() const { return "lines_count"s; }
 
-} // namespace analyser::metric::metric_impl
+}  // namespace analyser::metric::metric_impl
