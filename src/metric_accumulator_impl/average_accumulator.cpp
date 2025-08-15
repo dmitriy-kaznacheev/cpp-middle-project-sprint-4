@@ -24,7 +24,7 @@ void AverageAccumulator::Accumulate(const metric::MetricResult &metric_result) {
     Reset();
   }
 
-  sum += metric_result.value;
+  sum += std::get<int>(metric_result.value);
   ++count;
 }
 void AverageAccumulator::Finalize() {

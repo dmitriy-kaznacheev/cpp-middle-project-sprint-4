@@ -31,7 +31,8 @@ using namespace std::string_literals;
 const std::array acc_names{
   "lines_count"s,
   "cyclomatic_complexity"s,
-  "parameters_count"s
+  "parameters_count"s,
+  "naming_style"s,
 };
 
 int main(int argc, char *argv[]) {
@@ -48,6 +49,7 @@ int main(int argc, char *argv[]) {
       metric_extractor.RegisterMetric(std::make_unique<CodeLinesCountMetric>());
       metric_extractor.RegisterMetric(std::make_unique<CyclomaticComplexityMetric>());
       metric_extractor.RegisterMetric(std::make_unique<CountParametersMetric>());
+      metric_extractor.RegisterMetric(std::make_unique<NamingStyleMetric>()); 
     }
 
     auto analysis = analyser::AnalyseFunctions(options.GetFiles(), metric_extractor);
@@ -59,8 +61,9 @@ int main(int argc, char *argv[]) {
       return metrics;
     }) | 
     std::views::join |
-    std::views::transform([](auto &&metric) {
-      std::println("    {}: {}", metric.metric_name, metric.value);
+    std::views::transform([](const auto &metric) {
+      std::print("    {}: ", metric.metric_name);
+      std::visit([](const auto &v) { std::println("{}", v); }, metric.value);
       return 0;
     }) |
     rs::to<std::vector>();
@@ -71,6 +74,7 @@ int main(int argc, char *argv[]) {
       accumulator.RegisterAccumulator(acc_names[0], std::make_unique<SumAverageAccumulator>());
       accumulator.RegisterAccumulator(acc_names[1], std::make_unique<SumAverageAccumulator>());
       accumulator.RegisterAccumulator(acc_names[2], std::make_unique<AverageAccumulator>());
+      accumulator.RegisterAccumulator(acc_names[3], std::make_unique<CategoricalAccumulator>()); 
     }
 
     auto by_files = analyser::SplitByFiles(analysis);
@@ -102,6 +106,16 @@ int main(int argc, char *argv[]) {
         auto &acc = accumulator.GetFinalizedAccumulator<AverageAccumulator>(acc_names[2]);
         auto res = acc.Get();
         std::println("    {}: average = {:.2f}", acc_names[2], res);
+      }
+
+      {
+        auto &acc = accumulator.GetFinalizedAccumulator<CategoricalAccumulator>(acc_names[3]);
+        std::println("    {}:", acc_names[3]);
+        auto res = acc.Get();
+        std::ranges::for_each(res, [](const auto &p) {
+          const auto &[style, count] = p;
+          std::println("        {}: {}", style, count);
+        });
       }
     });
 
@@ -138,6 +152,15 @@ int main(int argc, char *argv[]) {
         auto &acc = accumulator.GetFinalizedAccumulator<AverageAccumulator>(acc_names[2]);
         auto res = acc.Get();
         std::println("    {}: average = {:.2f}", acc_names[2], res);
+      }
+
+      {
+        auto &acc = accumulator.GetFinalizedAccumulator<CategoricalAccumulator>(acc_names[3]);
+        auto res = acc.Get();
+        std::ranges::for_each(res, [](const auto &p) {
+          const auto &[style, count] = p;
+          std::println("        {}: {}", style, count);
+        });
       }
     });
     // clang-format 

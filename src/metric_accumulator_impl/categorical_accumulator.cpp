@@ -25,8 +25,16 @@ void CategoricalAccumulator::Accumulate(
     Reset();
   }
 
-  auto value = std::to_string(metric_result.value);
-  ++categories_freq[value];
+  std::visit(
+      [this](const auto &value) {
+        using T = std::decay_t<decltype(value)>;
+        if constexpr (std::is_same_v<T, int>) {
+          ++categories_freq[std::to_string(value)];
+        } else if constexpr (std::is_same_v<T, std::string>) {
+          ++categories_freq[value];
+        }
+      },
+      metric_result.value);
 }
 
 void CategoricalAccumulator::Finalize() { is_finalized = true; }
