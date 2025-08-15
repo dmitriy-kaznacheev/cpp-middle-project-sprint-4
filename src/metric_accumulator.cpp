@@ -21,11 +21,11 @@
 namespace analyser::metric_accumulator {
 
 void MetricsAccumulator::AccumulateNextFunctionResults(const std::vector<metric::MetricResult> &metric_results) const {
-    // здесь ваш код
+    rs::for_each(metric_results, [this](const auto &res) { accumulators.at(res.metric_name)->Accumulate(res); });
 }
 
 void MetricsAccumulator::ResetAccumulators() {
-    // здесь ваш код
+    rs::for_each(accumulators | std::views::values, [](auto &&acc) { acc->Reset(); });
 }
 
 }  // namespace analyser::metric_accumulator

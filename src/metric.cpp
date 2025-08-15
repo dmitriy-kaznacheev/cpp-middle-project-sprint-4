@@ -23,12 +23,15 @@
 namespace analyser::metric {
 
 void MetricExtractor::RegisterMetric(std::unique_ptr<IMetric> metric) {
-    // здесь ваш код
+    if (!metric) {
+        throw std::runtime_error{"metric for registration is invalid"};
+    }
+    metrics.emplace_back(std::move(metric));
 }
 
 MetricResults MetricExtractor::Get(const function::Function &func) const {
-    // здесь ваш код
-    return {};
+    return metrics | std::views::transform([&func](auto &&metric) { return metric->Calculate(func); }) |
+           std::ranges::to<std::vector>();
 }
 
 }  // namespace analyser::metric
